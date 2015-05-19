@@ -162,7 +162,6 @@ class WXpay(object):
         r = requests.post(self.URL_VERIFY_ORDER, xml_str)
         r.encoding = 'UTF-8'
         data = r.text.encode('UTF-8')
-        print data
 
         xml_dict = {}
         x = ElementTree.fromstring(data)
