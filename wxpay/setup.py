@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup, Extension
 setup(
     name = 'wxpay',
     packages = ['wxpay'],
