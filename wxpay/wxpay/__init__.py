@@ -34,6 +34,7 @@ class WXpay(object):
         self.appsecret = appsecret
         self.ip = ip
         self.notify_url = notify_url
+        self.cert_path = "pem证书路径"
 
     def generate_nonce_str(self, length=32):
         ''' 生成随机字符串 '''
@@ -108,6 +109,43 @@ class WXpay(object):
         else:
             ret_dict['prepay_id'] = x.find('prepay_id').text
         return ret_dict
+
+
+    def refundorder(self,out_trade_no=None,transaction_id=None,total_fee=None,refund_fee=None):
+        """退款接口"""
+
+        post_dict = {
+            'appid': self.appid,
+            'mch_id': self.mch_id,
+            'nonce_str': self.generate_nonce_str(),
+            'out_trade_no': out_trade_no,
+            "out_refund_no" : out_trade_no,
+            "transaction_id" : transaction_id,
+            "total_fee" : total_fee,
+            'refund_fee': refund_fee,
+            "op_user_id" : self.mch_id
+        }
+
+        post_dict["sign"] = self.generate_sign(post_dict)
+        ret_xml = dict2xml(post_dict, wrap='xml')
+        log.debug("请求参数")
+        log.debug(ret_xml)
+        r = requests.post(self.URL_REFUND_ORDER, data=ret_xml.encode('utf-8') ,cert=self.cert_path)
+        r.encoding = 'UTF-8'
+        data = r.text.encode('utf-8')
+        ret_dict = {}
+        x = ElementTree.fromstring(data)
+        if x.find('return_code').text.upper() == 'FAIL':
+            raise ParameterValueError(x.find('return_msg').text)
+        if x.find('result_code').text.upper() == 'FAIL':
+            raise ParameterValueError(x.find('err_code').text)
+
+        if x.find('return_code').text.upper() == "SUCCESS"  and x.find('result_code').text.upper() == "SUCCESS":
+            return True
+        return False
+
+
+
 
     def verify_notify(self, xml_str):
         ''' 验证通知返回值 '''
