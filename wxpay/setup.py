@@ -2,7 +2,7 @@ from setuptools import setup, Extension
 setup(
     name = 'wxpay',
     packages = ['wxpay'],
-    version = '0.1',
+    version = '0.13',
     description = 'a lib for wechat payment',
     author = 'sivacohan',
     author_email = 'sivacohan@gmail.com',
